@@ -142,7 +142,12 @@ def main() -> None:
     send_message_script = args.send_message_script
     # logging
     log_file = '{}/ukb_gatk4_haplotypeCaller.log'.format(os.path.dirname(config_file_path))
-    logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        filename=log_file, 
+        level=logging.INFO, 
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
     steward(config_file_path, ukb_gatk4_haplotypeCaller_path, send_message_script)
 
 
