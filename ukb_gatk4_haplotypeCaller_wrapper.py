@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import json
+import sys
 import time
 
 def send_json_message(analysis_path:str, send_message_script: str, message: dict, step_file_name:str) -> None:
@@ -19,8 +20,11 @@ def steward(config_file_path:str, ukb_gatk4_haplotypeCaller_path:str, send_messa
         config_d = json.load(config_f)
     # make the params.json file
     params_d = {
-        'cram' : config_d['ukbParams']['cram'],
-        'fasta': config_d['ukbParams']['fasta'],
+        'cram'      : config_d['ukbParams']['cram'],
+        'cram_index': config_d['ukbParams']['cram_index'],
+        'fasta'     : config_d['ukbParams']['fasta'],
+        'fasta_fai' : config_d['ukbParams']['fasta_fai'],
+        'fasta_dict': config_d['ukbParams']['fasta_dict']
     }
     params_file_path = '{}/params.json'.format(analysis_path)
     with open(params_file_path, 'w') as params_f:
@@ -29,12 +33,12 @@ def steward(config_file_path:str, ukb_gatk4_haplotypeCaller_path:str, send_messa
     return_value = os.system(ukb_gatk4_haplotypeCaller_command)
     logging.info(ukb_gatk4_haplotypeCaller_command)
     logging.info('return value:{}\n'.format(str(return_value)))
-    time.sleep(10)
+    time.sleep(20)
     # send the result files 
     feedback_dict = {
         'uuid'          : config_d['uuid'],
         'ukbId'         : config_d['ukbId'],
-        'ukbToolsCode'  : config_d['ukbToolsCode'],
+        'ukbToolsCode'  : config_d['ukbToolCode'],
         'ukbToolName'   : config_d['ukbToolName'],
         'pipeline'      : 'ukb',
         'analysisStatus': '',
@@ -53,6 +57,7 @@ def steward(config_file_path:str, ukb_gatk4_haplotypeCaller_path:str, send_messa
         feedback_dict['endDate']        = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         feedback_dict['error']          = 1
         send_json_message(analysis_path, send_message_script, feedback_dict, 'start.json')
+        sys.exit()
     flag = 0
     while True:
         execution_trace_file = '{}/results'.format(analysis_path)
